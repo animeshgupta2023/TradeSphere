@@ -1,0 +1,11 @@
+.nav-link{
+    margin-left: 40px;
+}
+
+.footer-link {
+    text-decoration: none;
+    color: grey;
+}
+.footer-link:hover {
+  color: darkgrey; /* optional hover effect */
+}
