@@ -1,6 +1,6 @@
 export default function Awards(){
     return (
-        <div className="container mt-5">
+        <div className="container mt-3">
             <div className="row">
                 <div className="col-6 p-5">
                     <img src="media/images/largestBroker.svg" alt="" />

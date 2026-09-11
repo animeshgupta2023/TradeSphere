@@ -19,8 +19,8 @@ export default function Stats(){
                 <div className="col-6 p-5">
                     <img src="media/images/ecosystem.png" alt="ecosystem" style={{width:"95%"}}/>
                     <div className="text-center">
-                        <a href="" className="" style={{textDecoration:"none"}}>Explore our products <i className="fa-solid fa-arrow-right"></i></a> &nbsp; &nbsp; &nbsp;
-                        <a href="" className="" style={{textDecoration:"none"}}>Try Kite demo <i className="fa-solid fa-arrow-right"></i></a>
+                        <a href=""  style={{textDecoration:"none"}}>Explore our products <i className="fa-solid fa-arrow-right"></i></a> &nbsp; &nbsp; &nbsp;
+                        <a href=""  style={{textDecoration:"none"}}>Try Kite demo <i className="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>

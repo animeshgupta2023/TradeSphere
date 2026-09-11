@@ -54,7 +54,7 @@ export default function Footer(){
                         <a href="" className="footer-link">Gift Nifty</a><br />
                     </div>
                 </div>
-                <div className="mt-5 text-small text-muted px-5" style={{fontSize:"12px"}}>
+                <div className="mt-5 text-small text-muted px-5" style={{fontSize:"11px"}}>
                     <p> 
                         Zerodha Broking Ltd.: Member of NSE, BSE, MCX & MSEI – SEBI Registration no.: INZ000031633 CDSL/NSDL: Depository services
                         through Zerodha Broking Ltd. – SEBI Registration no.: IN-DP-431-2019 Registered Address: Zerodha Broking Ltd., #153/154
@@ -106,7 +106,7 @@ export default function Footer(){
                         are regulated by the Reserve Bank of India (RBI).
                     </p>
                 </div>
-                <div className="px-5 mb-3" style={{fontSize:"14px", display:"flex", justifyContent:"space-evenly"}}>
+                <div className="px-5 mb-3" style={{fontSize:"15px", display:"flex", justifyContent:"space-evenly"}}>
                     <a href="" className="footer-link">NSE</a> 
                     <a href="" className="footer-link">BSE</a> 
                     <a href="" className="footer-link">MCX</a> 

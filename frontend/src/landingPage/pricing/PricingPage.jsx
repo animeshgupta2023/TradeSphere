@@ -1,15 +1,13 @@
 import Hero from "./Hero"
 import Brokerage from "./Brokerage"
-import Navbar from "../../Navbar"
-import Footer from "../../Footer"
+import OpenAccount from "../../OpenAccount"
 
-export default function Hero(){
+export default function PricingPage(){
     return (
         <>
-            <Navbar/>
             <Hero/>
+            <OpenAccount/>
             <Brokerage/>
-            <Footer/>
         </>
     )
 }
