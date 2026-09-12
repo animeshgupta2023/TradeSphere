@@ -1,5 +1,3 @@
-
-
 const Summary = () => {
   return (
     <>

@@ -27,11 +27,11 @@ const Positions = () => {
                           <td>{stock.name}</td>
                           <td>{stock.avg.toFixed(2)}</td>
                           <td>{stock.price.toFixed(2)}</td>
-                          <td className="profClass">
+                          <td className={profClass}>
                             {(currValue-stock.avg*stock.qty).toFixed(2)}
                           </td>
-                          <td className="profClass">{stock.net}</td>
-                          <td className="dayClass">{stock.day}</td>
+                          <td className={profClass}>{stock.net}</td>
+                          <td className={dayClass}>{stock.day}</td>
                         </tr>
                       )
             })}
