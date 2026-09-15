@@ -2,27 +2,64 @@ require("dotenv").config()
 
 const express = require("express")
 const mongoose = require("mongoose")
-const bodyParser = require("body-parser")
 const cors = require("cors")
+const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
+const cookieParser = require("cookie-parser")
 
 const {HoldingsModel}=require("./model/HoldingsModel")
 const { OrdersModel } = require("./model/OrdersModel");
 const {PositionsModel} = require("./model/PositionsModel")
+const {UsersModel} = require("./model/UsersModel")
 
 const PORT = process.env.PORT || 8080
 const URI = process.env.MONGO_URL
 
 const app = express()
 
-app.use(cors())
-app.use(bodyParser.json())
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "http://localhost:5174"
+    ],
+    credentials: true,
+    }
+))
+
+app.use(express.json())
+app.use(cookieParser())
+
+const createToken = (user) => jwt.sign(
+    {
+    userId: user._id,
+    email: user.email,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+)
 
 app.listen(PORT, ()=>{
     console.log("server has started")
     connectDB()
 })
 
-// added data here
+// authentication middleware
+function requireAuth(req, res, next){
+    const token = req.cookies.authToken
+
+    if(!token){
+        return res.status(401).json({message: "Authentication required"})
+    }
+
+    try{
+        req.user = jwt.verify(token, process.env.JWT_SECRET)
+        next()
+    } catch{
+        res.status(401).json({message:"Invalid or expired session"})
+    }
+}
+
+// added position and holding details to database
 // app.get("/addHoldings", async(req, res)=>{
 //     let tempHoldings = [
 //     {
@@ -190,18 +227,111 @@ app.listen(PORT, ()=>{
 //     res.send("done")
 // })
 
-app.get('/allHoldings', async(req, res)=>{
-    let allHoldings = await HoldingsModel.find({})
-    res.json(allHoldings)
+app.post("/auth/signup", async (req, res)=>{
+    try{
+        const {name, email, password} = req.body
+
+        if(!name || !email || !password || password.length < 8){
+            return res.status(400).json({
+                message: "Name, email, and an 8-character password are required",
+            })
+        }
+
+        const existingUser = await UsersModel.findOne({email})
+        if(existingUser){
+            return res.status(409).json({
+                message: "Email is already registered",
+            })
+        }
+        console.log(existingUser)
+
+        const user = await UsersModel.create({
+            name,
+            email, 
+            password,
+        })
+
+        console.log(user)
+
+        res.cookie("authToken", createToken(user),{
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 24*60*60*1000,
+        })
+        console.log("signed up")
+        res.status(201).json({
+            user: {
+                id: user._id, 
+                name: user.name,
+                email: user.email,
+            },
+        })
+    } catch(error){
+        console.error("Signup error:", error);
+        res.status(500).json({ message: "Signup Failed" });
+    }
 })
 
-app.get('/allPositions', async(req, res)=>{
-    let allPositions = await PositionsModel.find({})
-    res.json(allPositions)
+app.post("/auth/login", async (req, res)=>{
+    const {email, password} = req.body
+    try{
+        const user = await UsersModel.findOne({email})
+
+        if(!user || !(await bcrypt.compare(password, user.password))){
+            return res.status(401).json({message: "Invalid email or password"})
+        }
+
+        res.cookie("authToken", createToken(user), {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 24 * 60 * 60 * 1000,
+        })
+        console.log("logged in")
+        res.json({
+            user:{
+                id: user._id,
+                name: user.name,
+                email: user.email,
+            }
+        })
+    } catch(err){
+        console.error("Login error:", error);
+        res.status(500).json({ message: "Login failed due to server error" });
+    }
 })
 
-app.post("/newOrder", async (req, res) => {
+app.get("/auth/me", requireAuth, async (req, res) => {
+  const user = await UsersModel.findById(req.user.userId).select(
+    "_id name email"
+  );
+
+  res.json({ user });
+});
+
+app.post("/auth/logout", (req, res) => {
+  res.clearCookie("authToken");
+  res.json({ message: "Logged out" });
+}); 
+
+app.get('/allHoldings', requireAuth ,async(req, res)=>{
+    let holdings = await HoldingsModel.find({
+        userId: req.user.userId
+    })
+    res.json(holdings)
+})
+
+app.get('/allPositions',requireAuth, async(req, res)=>{
+    let positions = await PositionsModel.find({
+        userId: req.user.userId
+    })
+    res.json(positions) 
+})
+
+app.post("/newOrder", requireAuth, async (req, res) => {
   let newOrder = new OrdersModel({
+    userId: req.user.userId,
     name: req.body.name,
     qty: req.body.qty,
     price: req.body.price,
